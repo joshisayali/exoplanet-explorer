@@ -28,9 +28,9 @@ Instructions:
    * @param  {Object} data - The raw data describing the planet.
    */
   function createPlanetThumb(data) {
-    var pT = document.createElement('planet-thumb');
+    var pT = document.createElement('planet-thumb');      
     for (var d in data) {
-      pT[d] = data[d];
+      pT[d] = data[d];        
     }
     home.appendChild(pT);
   }
@@ -64,6 +64,23 @@ Instructions:
 
     Your code goes here!
      */
-    // getJSON('../data/earth-like-results.json')
+    getJSON('../data/earth-like-results.json')
+      .then(function(response){
+            addSearchHeader(response.query);
+        console.log(response);
+        return response.results[0];
+    })
+      .then(function(response){
+        return getJSON(response);
+    })
+      .then(function(response){
+        createPlanetThumb(response);
+        console.log(response);
+    })
+      .catch(function(error){
+        addSearchHeader('unknown');
+        console.log(error);
+    })
+      
   });
 })(document);
