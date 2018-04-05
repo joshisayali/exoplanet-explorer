@@ -64,6 +64,9 @@ Instructions:
 
     Your code goes here!
      */
+      
+      /*
+    //Syntax 1 - working code
     getJSON('../data/earth-like-results.json')
       .then(function(response){
             addSearchHeader(response.query);
@@ -80,7 +83,73 @@ Instructions:
       .catch(function(error){
         addSearchHeader('unknown');
         console.log(error);
-    })
+    })*/
+      
+      /*//Syntax 2
+      getJSON('../data/earth-like-results.json')
+        .then(function(response){
+             addSearchHeader(response.query);
+          return getJSON(response.results[0]);
+      })
+        .catch(function(error){
+          throw Error('Search request error');
+      })
+        .then(function(response){
+          createPlanetThumb(response);
+      })
+        .catch(function(error){
+          addSearchHeader('unknown');
+            console.log(error);
+      })*/
+      
+      //syntax 3
+      getJSON('../data/earth-like-results.json')
+        .then(function(response){
+             addSearchHeader(response.query);
+          return getJSON(response.results[0]);
+      })
+        .catch(function(error){
+          throw Error('Search request error'); //this catch catches any error in the first getJSON
+      })
+        .then(createPlanetThumb)
+        .catch(function(error){
+          addSearchHeader('unknown');
+            console.log(error);
+      })
+      
+      /*//testing promises in loop - works but not recommended way - see next assignment
+      getJSON('../data/earth-like-results.json')
+        .then(function(response){
+          addSearchHeader(response.query);
+          response.results.forEach(function(url){
+              getJSON(url).then(createPlanetThumb);
+          })
+      })
+      .catch(function(error){
+          addSearchHeader('unknown');
+            console.log(error);
+      })*/
+      
+      
+      /*//testing promises in loop - does not work
+      getJSON('../data/earth-like-results.json')
+        .then(function(response){
+          addSearchHeader(response.query);
+          response.results.forEach(function(url){
+              console.log(url);
+              return getJSON(url);
+          })
+      })
+      .then(function(response){
+          
+          createPlanetThumb(response);
+          console.log(response);
+      })
+      .catch(function(error){
+          addSearchHeader('unknown');
+            console.log(error);
+      })*/
+      
       
   });
 })(document);
