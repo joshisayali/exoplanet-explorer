@@ -56,17 +56,63 @@ Hint: you'll probably still need to use .map.
 
   window.addEventListener('WebComponentsReady', function() {
     home = document.querySelector('section[data-route="home"]');
-    /*
+    
+      //history code
+      //work but planets do not display in same order as URLs - parallel requests
+      /*getJSON('../data/earth-like-results.json')
+      .then(function(response){
+          addSearchHeader(response.query);
+          response.results.forEach(function(url){
+              getJSON(url).then(createPlanetThumb);
+          });          
+      });*/
+      
+      //works but planets do not display in same order as URLs - parallel requests
+      /*getJSON('../data/earth-like-results.json')
+      .then(function(response){
+          addSearchHeader(response.query);
+          response.results.map(function(url){
+              getJSON(url).then(createPlanetThumb);
+          });          
+      });*/
+      
+      //works and data is in same order as URLs but series requests
+      /*getJSON('../data/earth-like-results.json')
+      .then(function(response){
+          addSearchHeader(response.query);
+          
+          var sequence = Promise.resolve();
+          response.results.forEach(function(url){
+              sequence = sequence.then(function(){
+                  return getJSON(url);
+              }).then(createPlanetThumb);
+          });          
+      });*/
+      
+      /*
     Refactor this code with Promise.all!
      */
+    //data is in same order as URLs and parallel requests
     getJSON('../data/earth-like-results.json')
     .then(function(response) {
-
       addSearchHeader(response.query);
-
-      response.results.map(function(url) {
-        getJSON(url).then(createPlanetThumb);
-      });
+      
+    //commented code below does not work
+     /* var arrayOfPromises = response.results.map(function(url) {          
+          getJSON(url);       
+      });  
+    
+        return Promise.all(arrayOfPromises);*/
+        
+        return Promise.all(response.results.map(getJSON));
+    })
+    .then(function(planetData){
+        planetData.forEach(function(planet){
+          createPlanetThumb(planet);  
+        })
+    })
+    .catch(function(error){
+           console.log(error);
     });
   });
 })(document);
