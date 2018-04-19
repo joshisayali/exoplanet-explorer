@@ -26,11 +26,16 @@ proper order even if all the requests haven't finished.
    * @param  {Object} data - The raw data describing the planet.
    */
   function createPlanetThumb(data) {
-    var pT = document.createElement('planet-thumb');
-    for (var d in data) {
-      pT[d] = data[d];
-    }
-    home.appendChild(pT);
+      
+    return new Promise(function(resolve){
+         var pT = document.createElement('planet-thumb');
+        for (var d in data) {
+          pT[d] = data[d];
+        }
+        home.appendChild(pT);
+        resolve();
+    })
+   
   }
 
   /**
@@ -58,6 +63,26 @@ proper order even if all the requests haven't finished.
     /*
     Your code goes here!
      */
-    // getJSON('../data/earth-like-results.json')
+     getJSON('../data/earth-like-results.json')
+      .then(function(response){
+         addSearchHeader(response.query);
+         return response;
+     })
+      .then(function(response){
+         
+        var arrayOfExecutingPromises = response.results.map(function(url){
+            return getJSON(url);
+        });
+         
+         var sequence = Promise.resolve();
+         arrayOfExecutingPromises.forEach(function(request){
+             
+             sequence = sequence.then(function(){
+                 return request.then(createPlanetThumb);
+             });
+             
+         });
+         
+     });
   });
 })(document);
